@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(MOD_ID              "limes-visuals"          CACHE STRING "Runtime mod id (folder name)")
+set(MOD_ID              "limes-visuals"          CACHE STRING "Runtime mod id")
 set(MOD_NAME            "Lime's Visuals"         CACHE STRING "Display name")
 set(MOD_AUTHOR          "Lime"                   CACHE STRING "Author")
 set(MOD_VERSION         "0.1.0"                  CACHE STRING "Version")
@@ -13,33 +13,47 @@ set(MOD_LIBRARY_NAME    "limes_visuals"          CACHE STRING "Output .so name w
 
 include(FetchContent)
 
+set(LL_DEPS)
+
 if(NOT TARGET fmt::fmt)
-    FetchContent_Declare(
-        fmt
+    FetchContent_Declare(fmt
         GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-        GIT_TAG        11.2.0
-    )
+        GIT_TAG        11.2.0)
     set(FMT_DOC OFF CACHE BOOL "" FORCE)
     set(FMT_TEST OFF CACHE BOOL "" FORCE)
     set(FMT_INSTALL OFF CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(fmt)
+    list(APPEND LL_DEPS fmt)
 endif()
 
 if(NOT TARGET nlohmann_json::nlohmann_json)
-    FetchContent_Declare(
-        nlohmann_json
+    FetchContent_Declare(nlohmann_json
         GIT_REPOSITORY https://github.com/nlohmann/json.git
-        GIT_TAG        v3.11.3
-    )
-    FetchContent_MakeAvailable(nlohmann_json)
+        GIT_TAG        v3.11.3)
+    list(APPEND LL_DEPS nlohmann_json)
 endif()
 
-FetchContent_Declare(
-    preloader
+if(NOT TARGET Boost::pfr)
+    FetchContent_Declare(boost_pfr
+        GIT_REPOSITORY https://github.com/boostorg/pfr.git
+        GIT_TAG        boost-1.88.0)
+    list(APPEND LL_DEPS boost_pfr)
+endif()
+
+if(NOT TARGET magic_enum::magic_enum)
+    FetchContent_Declare(magic_enum
+        GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+        GIT_TAG        v0.9.7)
+    list(APPEND LL_DEPS magic_enum)
+endif()
+
+if(LL_DEPS)
+    FetchContent_MakeAvailable(${LL_DEPS})
+endif()
+
+FetchContent_Declare(preloader
     GIT_REPOSITORY https://github.com/LiteLDev/preloader-android.git
     GIT_TAG        main
-    GIT_SHALLOW    TRUE
-)
+    GIT_SHALLOW    TRUE)
 FetchContent_MakeAvailable(preloader)
 
 add_library(${MOD_LIBRARY_NAME} SHARED
@@ -55,6 +69,8 @@ target_include_directories(${MOD_LIBRARY_NAME} PRIVATE
 target_link_libraries(${MOD_LIBRARY_NAME} PRIVATE
     fmt::fmt
     nlohmann_json::nlohmann_json
+    Boost::pfr
+    magic_enum::magic_enum
     log
     android
     EGL
