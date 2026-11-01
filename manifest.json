@@ -1,0 +1,11 @@
+{
+  "type": "preload-native",
+  "name": "Lime's Visuals",
+  "author": "Lime",
+  "version": "0.1.0",
+  "description": "Chams / through-wall entity visuals for LeviLaunchroid",
+  "entry": "liblimes_visuals.so",
+  "minecraft_versions": ["1.26.60.4"],
+  "overwrite_files": [],
+  "overwrite_folders": []
+}

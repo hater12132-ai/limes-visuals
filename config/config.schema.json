@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "enabled": { "type": "boolean", "title": "Enable Chams", "default": true },
+    "throughWalls": { "type": "boolean", "title": "Through Walls", "default": true },
+    "colorR": { "type": "integer", "title": "Color Red", "minimum": 0, "maximum": 255, "default": 255 },
+    "colorG": { "type": "integer", "title": "Color Green", "minimum": 0, "maximum": 255, "default": 140 },
+    "colorB": { "type": "integer", "title": "Color Blue", "minimum": 0, "maximum": 255, "default": 0 },
+    "colorA": { "type": "integer", "title": "Color Alpha", "minimum": 0, "maximum": 255, "default": 200 }
+  },
+  "required": ["enabled", "throughWalls", "colorR", "colorG", "colorB", "colorA"]
+}

@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "throughWalls": true,
+  "colorR": 255,
+  "colorG": 140,
+  "colorB": 0,
+  "colorA": 200
+}
