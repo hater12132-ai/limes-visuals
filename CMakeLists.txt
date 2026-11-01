@@ -12,6 +12,28 @@ set(MOD_VERSION         "0.1.0"                  CACHE STRING "Version")
 set(MOD_LIBRARY_NAME    "limes_visuals"          CACHE STRING "Output .so name without lib prefix")
 
 include(FetchContent)
+
+if(NOT TARGET fmt::fmt)
+    FetchContent_Declare(
+        fmt
+        GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+        GIT_TAG        11.2.0
+    )
+    set(FMT_DOC OFF CACHE BOOL "" FORCE)
+    set(FMT_TEST OFF CACHE BOOL "" FORCE)
+    set(FMT_INSTALL OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(fmt)
+endif()
+
+if(NOT TARGET nlohmann_json::nlohmann_json)
+    FetchContent_Declare(
+        nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG        v3.11.3
+    )
+    FetchContent_MakeAvailable(nlohmann_json)
+endif()
+
 FetchContent_Declare(
     preloader
     GIT_REPOSITORY https://github.com/LiteLDev/preloader-android.git
@@ -31,6 +53,8 @@ target_include_directories(${MOD_LIBRARY_NAME} PRIVATE
 )
 
 target_link_libraries(${MOD_LIBRARY_NAME} PRIVATE
+    fmt::fmt
+    nlohmann_json::nlohmann_json
     log
     android
     EGL
