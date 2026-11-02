@@ -1,9 +1,20 @@
 {
   "version": 1,
-  "enabled": true,
-  "throughWalls": true,
-  "colorR": 255,
-  "colorG": 140,
-  "colorB": 0,
-  "colorA": 200
+  "masterEnabled": true,
+  "styleNova": true,
+  "styleWild": false,
+  "styleNursultanDiamond": false,
+  "styleNursultanScanner": false,
+  "styleGhostsClient": false,
+  "styleGhostsCatlean": false,
+  "styleWexsideSwords": false,
+  "styleSimsCrystal": false,
+  "styleJello": false,
+  "styleRockstarCrystals": false,
+  "styleRockstarChains": false,
+  "styleHitBubble": false,
+  "onlyPlayers": true,
+  "onlyWhenIHit": true,
+  "intensity": 100,
+  "particleCount": 12
 }
