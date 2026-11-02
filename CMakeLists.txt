@@ -8,7 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(MOD_ID              "limes-visuals"          CACHE STRING "Runtime mod id")
 set(MOD_NAME            "Lime's Visuals"         CACHE STRING "Display name")
 set(MOD_AUTHOR          "Lime"                   CACHE STRING "Author")
-set(MOD_VERSION         "0.1.0"                  CACHE STRING "Version")
+set(MOD_VERSION         "0.2.0"                  CACHE STRING "Version")
 set(MOD_LIBRARY_NAME    "limes_visuals"          CACHE STRING "Output .so name without lib prefix")
 
 include(FetchContent)
@@ -54,11 +54,14 @@ FetchContent_Declare(preloader
     GIT_REPOSITORY https://github.com/LiteLDev/preloader-android.git
     GIT_TAG        main
     GIT_SHALLOW    TRUE)
-FetchContent_MakeAvailable(preloader)
+FetchContent_GetProperties(preloader)
+if(NOT preloader_POPULATED)
+    FetchContent_Populate(preloader)
+endif()
 
 add_library(${MOD_LIBRARY_NAME} SHARED
     src/LimesVisuals.cpp
-    src/Chams.cpp
+    src/TargetESP.cpp
 )
 
 target_include_directories(${MOD_LIBRARY_NAME} PRIVATE
@@ -73,13 +76,15 @@ target_link_libraries(${MOD_LIBRARY_NAME} PRIVATE
     magic_enum::magic_enum
     log
     android
-    EGL
-    GLESv3
 )
 
 if(ANDROID)
     target_compile_definitions(${MOD_LIBRARY_NAME} PRIVATE ANDROID)
 endif()
+
+target_link_options(${MOD_LIBRARY_NAME} PRIVATE
+    -Wl,--unresolved-symbols=ignore-all
+)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     target_compile_options(${MOD_LIBRARY_NAME} PRIVATE -O2 -fvisibility=hidden)
@@ -87,13 +92,13 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 endif()
 
 add_custom_target(package_levipack
-    COMMAND \( {CMAKE_COMMAND} -E make_directory " \){CMAKE_BINARY_DIR}/package/${MOD_ID}"
-    COMMAND \( {CMAKE_COMMAND} -E copy " \)<TARGET_FILE:\( {MOD_LIBRARY_NAME}>" " \){CMAKE_BINARY_DIR}/package/\( {MOD_ID}/lib \){MOD_LIBRARY_NAME}.so"
-    COMMAND \( {CMAKE_COMMAND} -E copy " \){CMAKE_SOURCE_DIR}/manifest.json" "\( {CMAKE_BINARY_DIR}/package/ \){MOD_ID}/manifest.json"
-    COMMAND \( {CMAKE_COMMAND} -E make_directory " \){CMAKE_BINARY_DIR}/package/${MOD_ID}/config"
-    COMMAND \( {CMAKE_COMMAND} -E copy_if_different " \){CMAKE_SOURCE_DIR}/config/config.json" "\( {CMAKE_BINARY_DIR}/package/ \){MOD_ID}/config/config.json"
-    COMMAND \( {CMAKE_COMMAND} -E copy_if_different " \){CMAKE_SOURCE_DIR}/config/config.schema.json" "\( {CMAKE_BINARY_DIR}/package/ \){MOD_ID}/config/config.schema.json"
-    COMMAND \( {CMAKE_COMMAND} -E chdir " \){CMAKE_BINARY_DIR}/package" \( {CMAKE_COMMAND} -E tar "cf" " \){CMAKE_BINARY_DIR}/\( {MOD_ID}.levipack" --format=zip " \){MOD_ID}"
+    COMMAND ${CMAKE_COMMAND}
+        -DMOD_ID=${MOD_ID}
+        -DLIB_PATH=\( <TARGET_FILE: \){MOD_LIBRARY_NAME}>
+        -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+        -DOUTPUT_DIR=${CMAKE_BINARY_DIR}
+        -P ${CMAKE_SOURCE_DIR}/cmake/PackageLevipack.cmake
     COMMENT "Packaging ${MOD_ID}.levipack"
     DEPENDS ${MOD_LIBRARY_NAME}
+    VERBATIM
 )
